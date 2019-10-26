@@ -6,6 +6,7 @@ I've started this project because there are a lot of emerging frameworks for cre
 
 - [Bokeh](https://docs.bokeh.org/en/latest/index.html)
 - [Dash](https://plot.ly/dash/)
+- [Django-Dash](https://pypi.org/project/django-plotly-dash/)
 - [Panel](https://panel.pyviz.org/)
 - [Streamlit](https://streamlit.io)
 - [Voila](https://github.com/voila-dashboards/voila)
