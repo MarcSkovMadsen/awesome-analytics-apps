@@ -74,33 +74,30 @@ def stack_overflow_component(schema: pd.DataFrame, results: pd.DataFrame):
     stack_overflow_answers_component(results, selected_questions)
     respondents_per_country_component(results)
 
-
-def respondents_per_country_component(results):
-    """This component writes a bar chart showing number of Respondants per Country
+def stack_overflow_questions_component(schema: pd.DataFrame) -> Optional[List[str]]:
+    """This component writes the Stack Overflow Developer Questions and returns a selected list of
+    questions
 
     Arguments:
-        results {[type]} -- A DataFrame of the Results
-    """
-    st.subheader("Respondents per Country")
-    st.info(
-        """You can plot using matplot, seaborn, vega lite, plotly and other.
-    Here we have chosen plotly"""
-    )
-    distributions = (
-        (results[["Country", "Respondent"]].groupby("Country").count().reset_index())
-        .sort_values("Respondent")
-        .tail(50)
-    )
-    fig = px.bar(
-        distributions,
-        x="Respondent",
-        y="Country",
-        title="Count",
-        orientation="h",
-        height=1000,
-    )
-    st.plotly_chart(fig, height=1000)
+        schema {pd.DataFrame} -- A DataFrame of questions
 
+    Returns:
+        Optional[List[str]] -- [description]
+    """
+    st.subheader("Stack Overflow Questions 2019")
+    questions = st.multiselect(
+        "Select questions", options=sorted(schema["Column"].unique())
+    )
+    if questions:
+        schema_to_show = schema[schema["Column"].isin(questions)]
+    else:
+        number_of_schema_rows = st.radio(
+            "Select # Questions to show?", options=[10, len(schema)], index=0
+        )
+        schema_to_show = schema.head(number_of_schema_rows)
+
+    st.table(schema_to_show)
+    return questions
 
 def stack_overflow_answers_component(results, selected_questions: Optional[List[str]]):
     """This component writes the Stack Overflow Developer Survey Questions
@@ -127,32 +124,31 @@ def stack_overflow_answers_component(results, selected_questions: Optional[List[
     else:
         st_answers_dataframe.table(results_to_show)
 
-
-def stack_overflow_questions_component(schema: pd.DataFrame) -> Optional[List[str]]:
-    """This component writes the Stack Overflow Developer Questions and returns a selected list of
-    questions
+def respondents_per_country_component(results):
+    """This component writes a bar chart showing number of Respondants per Country
 
     Arguments:
-        schema {pd.DataFrame} -- A DataFrame of questions
-
-    Returns:
-        Optional[List[str]] -- [description]
+        results {[type]} -- A DataFrame of the Results
     """
-    st.subheader("Stack Overflow Questions 2019")
-    questions = st.multiselect(
-        "Select questions", options=sorted(schema["Column"].unique())
+    st.subheader("Respondents per Country")
+    st.info(
+        """You can plot using matplot, seaborn, vega lite, plotly and other.
+    Here we have chosen plotly"""
     )
-    if questions:
-        schema_to_show = schema[schema["Column"].isin(questions)]
-    else:
-        number_of_schema_rows = st.radio(
-            "Select # Questions to show?", options=[10, len(schema)], index=0
-        )
-        schema_to_show = schema.head(number_of_schema_rows)
-
-    st.table(schema_to_show)
-    return questions
-
+    distributions = (
+        (results[["Country", "Respondent"]].groupby("Country").count().reset_index())
+        .sort_values("Respondent")
+        .tail(50)
+    )
+    fig = px.bar(
+        distributions,
+        x="Respondent",
+        y="Country",
+        title="Count",
+        orientation="h",
+        height=1000,
+    )
+    st.plotly_chart(fig, height=1000)
 
 # The @st.cache annotation caches the dataframe
 # so that it only takes time to read the first time.

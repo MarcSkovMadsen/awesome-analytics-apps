@@ -4,7 +4,7 @@ import zipfile
 
 import pandas as pd
 
-LOCAL_ROOT = pathlib.Path.cwd()
+LOCAL_ROOT = pathlib.Path(__file__).parent.parent.parent
 GITHUB_ROOT = (
     "https://raw.githubusercontent.com/MarcSkovMadsen/awesome-analytics-apps/master/"
 )
@@ -12,7 +12,7 @@ DATA_STACK_OVERFLOW = "data/stackoverflow/"
 ZIP_FILE_2019 = "developer_survey_2019.zip"
 RESULTS_2019 = "survey_results_public.csv"
 SCHEMA_2019 = "survey_results_schema.csv"
-IMAGE_2019_URL = "https://github.com/MarcSkovMadsen/awesome-analytics-apps/blob/master/assets/images/stack_overflow_survey_2019.png?raw=true" # pylint: disable=line-too-long
+IMAGE_2019_URL = "https://github.com/MarcSkovMadsen/awesome-analytics-apps/blob/master/assets/images/stack_overflow_survey_2019.png?raw=true"  # pylint: disable=line-too-long
 SURVEY_2019_URL = "https://insights.stackoverflow.com/survey/2019"
 DATA_URL = "https://insights.stackoverflow.com/survey"
 

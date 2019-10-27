@@ -12,7 +12,9 @@ panel
 streamlit
 
 # Voila
+jupyter
 voila
+qgrid
 
 # Data Engineering and Science
 pandas==0.25.2

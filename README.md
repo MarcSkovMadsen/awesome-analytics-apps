@@ -73,6 +73,12 @@ Then you should install the local requirements
 pip install -r requirements_local.txt
 ```
 
+and enable the qgrid extension for Jupyter Notebooks
+
+```bash
+jupyter nbextension enable --py --sys-prefix qgrid
+```
+
 ### Build and run the Applications Locally
 
 ```bash
