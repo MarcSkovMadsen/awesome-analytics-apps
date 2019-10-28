@@ -8,6 +8,7 @@ import qgrid
 import styles
 from plotly import express as px
 from markdown import markdown
+from functools import lru_cache
 
 IPYTHON_DISPLAY_DOCS = (
     "https://ipython.readthedocs.io/en/stable/api/generated/IPython.display.html"
@@ -22,52 +23,37 @@ QGRID_DOCS = "https://qgrid.readthedocs.io/en/latest/index.html"
 def main():
     configure()
 
-    header_area = [widgets.HTML(markdown("# Awesome Analytics Apps in Voila"))]
-    sidebar_area = [
-        widgets.HTML(
-            markdown(
-                f"""
-## Resources
+    app_layout = widgets.AppLayout(
+        header=get_header(),
+        left_sidebar=get_sidebar(),
+        center=get_center(),
+        pane_widths=[2, 6, 1],
+        pane_heights=["75px", 1, "75px"],
+    )
+
+    ip.display(app_layout)
+
+
+def get_header():
+    header = widgets.HTML(
+        markdown("# Awesome Analytics Apps in Voila"),
+        layout=widgets.Layout(height="100px"),
+    )
+    header.style.text_align = "center"
+    return header
+
+
+def get_sidebar():
+    return widgets.HTML(
+        markdown(
+            f"""## Resources
 
 - [IPython display Docs]({IPYTHON_DISPLAY_DOCS})
 - [IPy Widgets Docs]({IPYWIDGETS_DOCS})
 - [QGrid Docs]({QGRID_DOCS})
-"""
-            )
+    """
         )
-    ]
-    ip.display(*header_area)
-    ip.display(*sidebar_area)
-
-    ip.display(
-        ip.Markdown(
-            """## Introduction
-
-You can use Python and Streamlit as shown in the code below to create a web app!
-"""
-        ),
-        # Use https://gist.github.com/jiffyclub/5385501 to format code
-        ip.Code(
-            """
-ip.display(
-    ip.Markdown(
-    "For more info watch the ***4 minutes introduction*** to Streamlit"
-    ),
-    ip.YouTubeVideo("VtchVpoSdoQ")
-)
-""",
-            language="python3",
-        ),
-        ip.Markdown("For more info watch the ***30 minutes introduction*** to Voila"),
-        ip.YouTubeVideo("VtchVpoSdoQ"),
     )
-
-    schema = stack_overflow.read_schema()
-    results = stack_overflow.read_results()
-
-    stack_overflow_component(schema, results)
-
-    # layout_page(header_area, sidebar_area, main_area, footer_area)
 
 
 def configure():
@@ -89,6 +75,46 @@ def configure():
     )
 
 
+def get_center():
+    items = [get_resources(), get_stack_overflow()]
+    return to_output_widget(items)
+    # widgets.VBox((get_resources(), get_stack_overflow()))
+
+
+def get_resources():
+    items = [
+        ip.Markdown(
+            """## Introduction
+
+You can use Python and Streamlit as shown in the code below to create a web app!
+"""
+        ),
+        # Use https://gist.github.com/jiffyclub/5385501 to format code
+        ip.Code(
+            """
+ip.display(
+    ip.Markdown(
+    "For more info watch the ***4 minutes introduction*** to Streamlit"
+    ),
+    ip.YouTubeVideo("VtchVpoSdoQ")
+)
+""",
+            language="python3",
+        ),
+        ip.Markdown("For more info watch the ***30 minutes introduction*** to Voila"),
+        ip.YouTubeVideo("VtchVpoSdoQ"),
+    ]
+    return to_output_widget(items)
+
+
+def to_output_widget(items) -> widgets.Widget:
+    out = widgets.Output()
+    with out:
+        for item in items:
+            ip.display(item)
+    return out
+
+
 def run_all_code_below(input):
     ip.display(ip.Javascript("IPython.notebook.execute_cells_below()"))
 
@@ -99,10 +125,26 @@ def run_all_code_below_button():
     ip.display(button)
 
 
-def stack_overflow_component(schema: pd.DataFrame, results: pd.DataFrame):
-    """The Stack Overflow compontent writes the Questions, Results and a Distribution"""
+@lru_cache(maxsize=2)
+def get_data():
+    return stack_overflow.read_schema(), stack_overflow.read_results()
 
-    ip.display(
+
+def get_stack_overflow():
+    """The Stack Overflow compontent writes the Questions, Results and a Distribution"""
+    schema, results = get_data()
+
+    items = [get_stack_overflow_intro()]
+
+    # questions_grid = stack_overflow_questions_component(schema)
+    # stack_overflow_answers_component(results, questions_grid)
+    # respondents_per_country_component(results)
+
+    return to_output_widget(items)
+
+
+def get_stack_overflow_intro():
+    items = [
         ip.Markdown(
             f"""
 ## Stack Overflow 2019
@@ -118,11 +160,8 @@ Results: [{stack_overflow.SURVEY_2019_URL}]({stack_overflow.DATA_URL})
 Data: [{stack_overflow.DATA_URL}]({stack_overflow.DATA_URL})
 """
         )
-    )
-
-    questions_grid = stack_overflow_questions_component(schema)
-    stack_overflow_answers_component(results, questions_grid)
-    respondents_per_country_component(results)
+    ]
+    return to_output_widget(items)
 
 
 def stack_overflow_questions_component(schema: pd.DataFrame) -> qgrid.QGridWidget:

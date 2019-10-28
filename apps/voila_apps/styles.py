@@ -11,7 +11,7 @@ RESULTS_GRID_COL_DEFS = {
 }
 
 
-def layout_page(header, sidebar, main_, footer):
+def layout_app(header, sidebar, main_, footer):
     header_area = widgets.HBox(
         children=header,
         layout=widgets.Layout(
