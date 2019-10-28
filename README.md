@@ -81,8 +81,22 @@ jupyter nbextension enable --py --sys-prefix qgrid
 
 ### Build and run the Applications Locally
 
+#### Streamlit
+
 ```bash
 streamlit run apps/streamlit_apps/app.py
+```
+
+#### Jupyter Voila
+
+```bash
+voila apps/voila_apps/app.py
+```
+
+and the associated Jupyter Notebook
+
+```bash
+jupyter notebook apps/voila_apps/app.py
 ```
 
 ### Run all tests
