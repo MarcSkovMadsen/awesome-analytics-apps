@@ -28,8 +28,8 @@ def main():
         header=get_header(),
         left_sidebar=get_sidebar(),
         center=get_center(),
-        right=widgets.VBox(),
-        pane_widths=[2, 6, 1],
+        right_sidebar=widgets.Output(),
+        pane_widths=[2, "1400px", 1],
         pane_heights=["75px", 1, "75px"],
     )
 
@@ -57,7 +57,6 @@ def get_sidebar():
         )
     )
 
-
 def configure():
     pd.set_option("display.max_columns", 1000)  # or 1000
     pd.set_option("display.max_rows", 100)  # or 1000
@@ -69,7 +68,7 @@ def configure():
             """
     <style type="text/css">
     .q-grid-container {
-        max-width: 1000 px;
+        max-width: 100%;
     }
     </style>
     """
@@ -88,12 +87,13 @@ def get_resources():
         ip.Markdown(
             """## Introduction
 
-You can use Python and Streamlit as shown in the code below to create a web app!
+You can use Python and Voila as shown in the code below to create a web app!
 """
         ),
         # Use https://gist.github.com/jiffyclub/5385501 to format code
         ip.Code(
             """
+import ipython.display as ip
 ip.display(
     ip.Markdown(
     "For more info watch the ***4 minutes introduction*** to Streamlit"
@@ -158,7 +158,7 @@ def get_stack_overflow_intro():
 You will be analyzing and providing insights from the Stack Overflow 2019 survey
 
 <a href="{stack_overflow.SURVEY_2019_URL}" target="_blank">
-<img src="{stack_overflow.IMAGE_2019_URL}"style="height=300px;">
+<img src="{stack_overflow.IMAGE_2019_URL}"style="width=100%;">
 </a>
 
 Results: [{stack_overflow.SURVEY_2019_URL}]({stack_overflow.DATA_URL})
@@ -246,6 +246,7 @@ def respondents_per_country_component(results):
         y="Country",
         title="Count",
         orientation="h",
+        height=800,
         width=1200,
     )
     return to_output_widget(
