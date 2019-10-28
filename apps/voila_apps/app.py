@@ -1,14 +1,15 @@
+from functools import lru_cache
+from typing import List, Optional
+
 import IPython.display as ip
 import ipywidgets as widgets
 import pandas as pd
 import qgrid
-from awesome_analytics_apps import stack_overflow
-from typing import Optional, List
-import qgrid
-import styles
-from plotly import express as px
 from markdown import markdown
-from functools import lru_cache
+from plotly import express as px
+import plotly.graph_objects as go
+import styles
+from awesome_analytics_apps import stack_overflow
 
 IPYTHON_DISPLAY_DOCS = (
     "https://ipython.readthedocs.io/en/stable/api/generated/IPython.display.html"
@@ -27,6 +28,7 @@ def main():
         header=get_header(),
         left_sidebar=get_sidebar(),
         center=get_center(),
+        right=widgets.VBox(),
         pane_widths=[2, 6, 1],
         pane_heights=["75px", 1, "75px"],
     )
@@ -134,11 +136,15 @@ def get_stack_overflow():
     """The Stack Overflow compontent writes the Questions, Results and a Distribution"""
     schema, results = get_data()
 
-    items = [get_stack_overflow_intro()]
-
-    # questions_grid = stack_overflow_questions_component(schema)
-    # stack_overflow_answers_component(results, questions_grid)
-    # respondents_per_country_component(results)
+    questions_grid = stack_overflow_questions_grid(schema)
+    items = [
+        get_stack_overflow_intro(),
+        ip.Markdown("""## Stack Overflow Questions 2019"""),
+        questions_grid,
+        ip.Markdown("## Stack Overflow Results 2019"),
+        stack_overflow_results_grid(results, questions_grid),
+        respondents_per_country_component(results),
+    ]
 
     return to_output_widget(items)
 
@@ -164,7 +170,7 @@ Data: [{stack_overflow.DATA_URL}]({stack_overflow.DATA_URL})
     return to_output_widget(items)
 
 
-def stack_overflow_questions_component(schema: pd.DataFrame) -> qgrid.QGridWidget:
+def stack_overflow_questions_grid(schema: pd.DataFrame) -> qgrid.QGridWidget:
     """This component writes the Stack Overflow Developer Questions
 
     Arguments:
@@ -174,15 +180,6 @@ def stack_overflow_questions_component(schema: pd.DataFrame) -> qgrid.QGridWidge
         qgrid.QGridWidget -- Returns the QGridWidget Grid used to show the questions.
         Can be used to filter answers later on.
     """
-    ip.display(
-        ip.Markdown(
-            """\
-# Stack Overflow Questions 2019
-
-
-"""
-        )
-    )
     questions_grid = qgrid.show_grid(
         schema,
         column_options=styles.RESULTS_GRID_COL_OPTIONS,
@@ -190,19 +187,18 @@ def stack_overflow_questions_component(schema: pd.DataFrame) -> qgrid.QGridWidge
     )
     # We select something so that some Answers are shown
     questions_grid.change_selection(rows=[0, 1])
-    ip.display(questions_grid)
     return questions_grid
 
 
-def stack_overflow_answers_component(results, questions_grid: qgrid.QGridWidget):
+def stack_overflow_results_grid(
+    results, questions_grid: qgrid.QGridWidget
+) -> widgets.Widget:
     """This component writes the Stack Overflow Developer Survey Questions
 
     Arguments:
         results {[type]} -- A DataFrame of the Results
         questions_grid {qgrid.QGridWidget} -- The table of questions
     """
-
-    ip.display(ip.Markdown("# Stack Overflow Results 2019"))
 
     def get_selected_questions(questions_grid):
         return list(questions_grid.get_selected_df()["Column"])
@@ -230,8 +226,7 @@ def stack_overflow_answers_component(results, questions_grid: qgrid.QGridWidget)
 
     questions_grid.observe(handler=questions_grid_handler, names="_selected_rows")
 
-    ip.display(no_results_grid)
-    ip.display(results_grid)
+    return to_output_widget([no_results_grid, results_grid])
 
 
 def respondents_per_country_component(results):
@@ -240,14 +235,6 @@ def respondents_per_country_component(results):
     Arguments:
         results {[type]} -- A DataFrame of the Results
     """
-    ip.display(
-        ip.Markdown(
-            """### Respondents per Countrys
-
-You can plot using matplot, seaborn, vega lite, plotly and other. Here we have chosen plotly
-"""
-        )
-    )
     distributions = (
         (results[["Country", "Respondent"]].groupby("Country").count().reset_index())
         .sort_values("Respondent")
@@ -259,9 +246,18 @@ You can plot using matplot, seaborn, vega lite, plotly and other. Here we have c
         y="Country",
         title="Count",
         orientation="h",
-        width=styles.MAX_WIDTH,
+        width=1200,
     )
-    ip.display(fig)
+    return to_output_widget(
+        [
+            ip.Markdown(
+                """### Respondents per Countrys
+You can plot using matplot, seaborn, vega lite, plotly and other. Here we have chosen plotly
+            """
+            ),
+            go.FigureWidget(fig),
+        ]
+    )
 
 
 if __name__ == "__main__":
