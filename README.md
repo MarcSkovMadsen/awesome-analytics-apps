@@ -87,17 +87,23 @@ jupyter nbextension enable --py --sys-prefix qgrid
 streamlit run apps/streamlit_apps/app.py
 ```
 
-#### Jupyter Voila
+![Streamlit App](https://github.com/MarcSkovMadsen/awesome-analytics-apps/blob/master/assets/images/streamlit_app.png?raw=true)
+
+#### Voila
 
 ```bash
 voila apps/voila_apps/app.py
 ```
+
+![Voila App](https://github.com/MarcSkovMadsen/awesome-analytics-apps/blob/master/assets/images/voila_app.png?raw=true)
 
 and the associated Jupyter Notebook
 
 ```bash
 jupyter notebook apps/voila_apps/app.py
 ```
+
+![Jupyter Notebook](https://github.com/MarcSkovMadsen/awesome-analytics-apps/blob/master/assets/images/voila_notebook.png?raw=true)
 
 ### Run all tests
 
